@@ -24,6 +24,9 @@ let usuarioSchema = new Schema({
         type:String,
         required:true,
         enum:roles
+    },
+    salt:{
+        type:String
     }
 })
 

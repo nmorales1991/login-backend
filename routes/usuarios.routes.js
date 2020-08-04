@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const Usuarios = require("../models/usuarios");
 const bcrypt = require("bcryptjs");
+const crypto = require('crypto')
 const { verificarToken , verificaRol } = require("../middlewares/autenticacion");
 
 app.get("/", [verificarToken,verificaRol], async (req, res) => {
@@ -12,14 +13,42 @@ app.get("/", [verificarToken,verificaRol], async (req, res) => {
     });
 });
 
-app.post("/", async (req, res) => {
-    let body = req.body;
+app.post("/", (req, res) => {
+    let {nombre, correo, rol,clave} = req.body;
+    
+    crypto.randomBytes(16, (err,salt)=>{
+        const newSalt = salt.toString('base64')
+        crypto.pbkdf2(clave,newSalt,1000,64,'sha1',(err,key)=>{
+            const encryptedPassword = key.toString('base64')
+            Usuarios.findOne({correo}).then(user=>{
+                if(user){
+                    return res.send('Usuario ya existe')
+                }
+                Usuarios.create({
+                    nombre,
+                    correo,
+                    rol,
+                    clave: encryptedPassword,
+                    salt: newSalt
+                }).then((usuario)=>{
+                    res.send({mensaje:'usuario creado', usuario})
+                }).catch(err=>{
+                   
+                    return res.status(500).json({
+                        err
+                    });
+                    
+                })
+            })
+        })
+    })
 
-    let nuevousuario = new Usuarios({
-        nombre: body.nombre,
-        correo: body.correo,
-        rol: body.rol,
-        clave: bcrypt.hashSync(body.clave, 10)
+    //con bcrypt y sin salt
+    /*let nuevousuario = new Usuarios({
+        nombre,
+        correo,
+        rol,
+        clave: bcrypt.hashSync(clave, 10)
     });
 
     await nuevousuario.save((err, usuario) => {
@@ -32,7 +61,7 @@ app.post("/", async (req, res) => {
         res.json({
             usuario
         });
-    });
+    });*/
 });
 
 module.exports = app;

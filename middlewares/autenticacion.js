@@ -4,11 +4,12 @@ let verificarToken = (req, res, next) => {
   let token = req.get("Authorization");//headers
 
   jwt.verify(token, "secret", (err, decoded) => {
+    console.log(err)
 
     if (err) {
       return res.status(401).json({
         ok: false,
-        err
+        err:'Token no válido'
       });
     }
 
