@@ -2,9 +2,9 @@ const express = require("express");
 const app = express();
 const Usuarios = require("../models/usuarios");
 const bcrypt = require("bcryptjs");
-const { verificarToken } = require("../middlewares/autenticacion");
+const { verificarToken , verificaRol } = require("../middlewares/autenticacion");
 
-app.get("/", verificarToken, async (req, res) => {
+app.get("/", [verificarToken,verificaRol], async (req, res) => {
     await Usuarios.find((err, usuarios) => {
         res.json({
             usuarios
@@ -18,6 +18,7 @@ app.post("/", async (req, res) => {
     let nuevousuario = new Usuarios({
         nombre: body.nombre,
         correo: body.correo,
+        rol: body.rol,
         clave: bcrypt.hashSync(body.clave, 10)
     });
 

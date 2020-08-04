@@ -19,6 +19,20 @@ let verificarToken = (req, res, next) => {
 
 };
 
+let verificaRol = (req, res, next)=>{
+  let usuario = req.usuariobd
+  if(usuario.rol === 'ADMIN'){
+    next()
+  }else{
+    return res.json({
+      ok: false,
+      mensaje:'El usuario debe ser administrador'
+    });
+  }
+  
+}
+
 module.exports = {
-  verificarToken
+  verificarToken,
+  verificaRol
 };
