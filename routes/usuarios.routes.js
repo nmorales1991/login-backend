@@ -13,10 +13,10 @@ app.get("/", [verificarToken,verificaRol], async (req, res) => {
     });
 });
 
-app.post("/", (req, res) => {
+app.post("/", async (req, res) => {
     let {nombre, correo, rol,clave} = req.body;
     
-    crypto.randomBytes(16, (err,salt)=>{
+    /*crypto.randomBytes(16, (err,salt)=>{
         const newSalt = salt.toString('base64')
         crypto.pbkdf2(clave,newSalt,1000,64,'sha1',(err,key)=>{
             const encryptedPassword = key.toString('base64')
@@ -41,10 +41,10 @@ app.post("/", (req, res) => {
                 })
             })
         })
-    })
+    })*/
 
     //con bcrypt y sin salt
-    /*let nuevousuario = new Usuarios({
+    let nuevousuario = new Usuarios({
         nombre,
         correo,
         rol,
@@ -61,7 +61,7 @@ app.post("/", (req, res) => {
         res.json({
             usuario
         });
-    });*/
+    });
 });
 
 module.exports = app;
